@@ -17,13 +17,22 @@ def list_cards():
     if status:
         q = q.filter_by(status=status)
     cards = q.order_by(Card.id.asc()).all()
+
+    # 카드 수만큼 쿼리가 늘어나지 않도록 사용자 정보를 한 번에 조회한다. (N+1 방지)
+    user_ids = [c.user_id for c in cards]
+    users_by_id = {}
+    if user_ids:
+        for u in User.query.filter(User.id.in_(user_ids)).all():
+            users_by_id[u.id] = u
+
     result = []
     for c in cards:
         d = c.to_dict()
-        d["user_name"] = c.user.name if c.user else None
-        d["department"] = c.user.department if c.user else None
-        d["position"] = c.user.position if c.user else None
-        d["employment_status"] = c.user.employment_status if c.user else None
+        u = users_by_id.get(c.user_id)
+        d["user_name"] = u.name if u else None
+        d["department"] = u.department if u else None
+        d["position"] = u.position if u else None
+        d["employment_status"] = u.employment_status if u else None
         result.append(d)
     return jsonify(result)
 

@@ -22,9 +22,16 @@ def list_access_areas():
 def list_access_exceptions():
     """부서/직급 정책과 다르게 수동으로 예외처리된 출입권한 전체 목록."""
     grants = access_service.list_manual_exceptions()
+
+    user_ids = [g.user_id for g in grants]
+    users_by_id = {}
+    if user_ids:
+        for u in User.query.filter(User.id.in_(user_ids)).all():
+            users_by_id[u.id] = u
+
     result = []
     for g in grants:
-        user = User.query.get(g.user_id)
+        user = users_by_id.get(g.user_id)
         d = g.to_dict()
         d["user_name"] = user.name if user else None
         d["department"] = user.department if user else None

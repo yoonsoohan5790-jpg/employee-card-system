@@ -41,27 +41,40 @@ function render(applications) {
 
 window.approveApplication = async function (id, name) {
   if (!confirm(`${name}님의 신청을 승인하고 사원증을 발급하시겠습니까?`)) return;
-  const res = await fetch(`/api/card-applications/${id}/approve`, { method: 'POST' });
-  const data = await res.json();
-  if (res.ok) {
-    loadApplications();
-  } else {
-    alert(data.error || '승인에 실패했습니다.');
+
+  try {
+    const res = await fetch(`/api/card-applications/${id}/approve`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      alert(`${name}님의 신청을 승인하고 사원증을 발급했습니다.`);
+      loadApplications();
+    } else {
+      alert(data.error || '승인에 실패했습니다.');
+    }
+  } catch (e) {
+    alert('승인 처리 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
   }
 };
 
 window.rejectApplication = async function (id, name) {
-  const reason = prompt(`${name}님의 신청을 반려하는 사유를 입력해주세요 (선택)`) || '';
-  const res = await fetch(`/api/card-applications/${id}/reject`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reason }),
-  });
-  const data = await res.json();
-  if (res.ok) {
-    loadApplications();
-  } else {
-    alert(data.error || '반려에 실패했습니다.');
+  const reason = prompt(`${name}님의 신청을 반려하는 사유를 입력해주세요 (선택, 취소를 누르면 반려하지 않습니다)`);
+  if (reason === null) return; // 사용자가 프롬프트를 취소한 경우 반려를 진행하지 않는다.
+
+  try {
+    const res = await fetch(`/api/card-applications/${id}/reject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(`${name}님의 신청을 반려했습니다.`);
+      loadApplications();
+    } else {
+      alert(data.error || '반려에 실패했습니다.');
+    }
+  } catch (e) {
+    alert('반려 처리 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
   }
 };
 
