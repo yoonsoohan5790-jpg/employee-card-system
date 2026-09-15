@@ -6,15 +6,62 @@
   <span class="user-chip">{{ session.get('name') }}님 (관리자)</span>
 </div>
 
+<div class="toolbar">
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="이름 또는 아이디로 검색">
+  </div>
+</div>
+
 <div class="table-wrap">
   <table>
     <thead>
       <tr id="accessTableHead">
-        <th>조직원</th><th>부서</th><th>직급</th><th>재직상태</th><th>권한상태</th>
+        <th>조직원</th><th>부서</th><th>직급</th><th>재직상태</th><th>권한상태</th><th>관리</th>
       </tr>
     </thead>
     <tbody id="accessTableBody"></tbody>
   </table>
+</div>
+
+<div class="panel" style="margin-top:20px;">
+  <h3>예외처리 목록 <span style="font-weight:400; color:var(--text-muted); font-size:12px;">(부서/직급 정책과 다르게 수동으로 부여한 출입권한)</span></h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>조직원</th><th>부서</th><th>직급</th><th>재직상태</th><th>구역</th><th>허용여부</th><th>사유</th><th>적용 기간</th><th>최종 변경일</th>
+        </tr>
+      </thead>
+      <tbody id="exceptionTableBody">
+        <tr><td colspan="9" class="alert-empty">불러오는 중...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="exceptionModalBackdrop">
+  <div class="modal">
+    <h3 id="exceptionModalTitle">출입권한 예외처리</h3>
+    <input type="hidden" id="e_user_id">
+    <label>출입구역</label>
+    <select id="e_area_id"></select>
+    <label>허용 여부</label>
+    <select id="e_allowed">
+      <option value="true">허용 (정책보다 추가 허용)</option>
+      <option value="false">차단 (정책보다 추가 차단)</option>
+    </select>
+    <label>예외처리 사유 (필수)</label>
+    <input type="text" id="e_reason" placeholder="예: 서버 장애 대응을 위한 임시 서버실 출입 허용">
+    <label>적용 기간 - 종료일 (선택, 비워두면 무기한)</label>
+    <input type="date" id="e_expires_at">
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">
+      종료일이 지나면 자동으로 부서/직급 정책 값으로 되돌아갑니다.
+    </p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btnCancelException">취소</button>
+      <button class="btn" id="btnSaveException">저장</button>
+    </div>
+  </div>
 </div>
 {% endblock %}
 

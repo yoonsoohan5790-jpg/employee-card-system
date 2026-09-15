@@ -3,6 +3,8 @@ from flask import Blueprint, request, jsonify, session
 from extensions import db
 from models.access_area import AccessArea
 from models.access_policy import AccessPolicy
+from models.user import User
+from services import access_service
 from utils.decorators import admin_required
 
 bp = Blueprint("access", __name__, url_prefix="/api")
@@ -13,6 +15,23 @@ bp = Blueprint("access", __name__, url_prefix="/api")
 def list_access_areas():
     areas = AccessArea.query.order_by(AccessArea.id.asc()).all()
     return jsonify([a.to_dict() for a in areas])
+
+
+@bp.get("/access-exceptions")
+@admin_required
+def list_access_exceptions():
+    """부서/직급 정책과 다르게 수동으로 예외처리된 출입권한 전체 목록."""
+    grants = access_service.list_manual_exceptions()
+    result = []
+    for g in grants:
+        user = User.query.get(g.user_id)
+        d = g.to_dict()
+        d["user_name"] = user.name if user else None
+        d["department"] = user.department if user else None
+        d["position"] = user.position if user else None
+        d["employment_status"] = user.employment_status if user else None
+        result.append(d)
+    return jsonify(result)
 
 
 @bp.post("/access-areas")

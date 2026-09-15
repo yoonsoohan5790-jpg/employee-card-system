@@ -49,13 +49,14 @@ def _start_scheduler(app):
     routes/dashboard.py의 summary API 호출 시점에 동일 로직을 인라인으로 실행한다.
     """
     from apscheduler.schedulers.background import BackgroundScheduler
-    from services import employment_service
+    from services import employment_service, access_service
 
     scheduler = BackgroundScheduler(daemon=True)
 
     def job():
         with app.app_context():
             employment_service.check_leave_end_dates()
+            access_service.revert_expired_exceptions()
 
     scheduler.add_job(job, "interval", minutes=5, next_run_time=None)
     scheduler.start()

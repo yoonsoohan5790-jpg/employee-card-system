@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify, session
 
 from extensions import db
 from models.user import User, EMPLOYMENT_STATUS_ACTIVE, EMPLOYMENT_STATUSES, ROLE_EMPLOYEE, ROLE_ADMIN
+from models.card import Card
 from models.user_access import UserAccess
 from services import card_service, access_service, employment_service
 from utils.decorators import login_required, admin_required, get_current_user
@@ -29,11 +30,21 @@ def list_users():
         q = q.filter_by(employment_status=status)
 
     users = q.order_by(User.id.asc()).all()
+
+    # 사용자 수만큼 쿼리가 늘어나지 않도록 카드/권한상태를 한 번에 조회한다. (N+1 방지)
+    user_ids = [u.id for u in users]
+    cards_by_user = {}
+    if user_ids:
+        for c in Card.query.filter(Card.user_id.in_(user_ids)).all():
+            cards_by_user[c.user_id] = c
+    status_by_user = access_service.get_access_status_bulk(users)
+
     result = []
     for u in users:
         d = u.to_dict()
-        d["card"] = u.card.to_dict() if u.card else None
-        d["access_status"] = access_service.get_user_access_status(u)
+        card = cards_by_user.get(u.id)
+        d["card"] = card.to_dict() if card else None
+        d["access_status"] = status_by_user.get(u.id)
         result.append(d)
     return jsonify(result)
 
@@ -189,10 +200,25 @@ def update_user_access(user_id):
     data = request.get_json(force=True)
     area_id = data.get("area_id")
     allowed = bool(data.get("allowed"))
+    reason = (data.get("reason") or "").strip() or None
+    expires_at_raw = (data.get("expires_at") or "").strip() or None
 
     if area_id is None:
         return jsonify({"error": "area_id 값은 필수입니다."}), 400
+    if not reason:
+        return jsonify({"error": "예외처리 사유를 입력해주세요."}), 400
 
-    grant = access_service.set_manual_access(user, int(area_id), allowed, actor=session.get("name", "admin"))
+    expires_at = None
+    if expires_at_raw:
+        try:
+            expires_at = _parse_date(expires_at_raw)
+        except ValueError:
+            return jsonify({"error": "적용 기간(종료일) 형식이 올바르지 않습니다."}), 400
+        if expires_at < date.today():
+            return jsonify({"error": "적용 기간(종료일)은 오늘 이후로 설정해주세요."}), 400
+
+    grant = access_service.set_manual_access(
+        user, int(area_id), allowed, actor=session.get("name", "admin"), reason=reason, expires_at=expires_at
+    )
     db.session.commit()
     return jsonify(grant.to_dict())

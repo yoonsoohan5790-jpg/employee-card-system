@@ -1,4 +1,5 @@
 const tableBody = document.getElementById('userTableBody');
+const searchInput = document.getElementById('searchInput');
 const filterDept = document.getElementById('filterDept');
 const filterStatus = document.getElementById('filterStatus');
 const modalBackdrop = document.getElementById('userModalBackdrop');
@@ -42,8 +43,14 @@ function render(users) {
 function applyFilter() {
   const dept = filterDept.value;
   const status = filterStatus.value;
+  const keyword = searchInput.value.trim().toLowerCase();
   const filtered = allUsers.filter(u =>
-    (!dept || u.department === dept) && (!status || u.employment_status === status)
+    (!dept || u.department === dept) &&
+    (!status || u.employment_status === status) &&
+    (!keyword ||
+      u.name.toLowerCase().includes(keyword) ||
+      u.username.toLowerCase().includes(keyword) ||
+      (u.email || '').toLowerCase().includes(keyword))
   );
   render(filtered);
 }
@@ -62,6 +69,7 @@ async function loadUsers() {
 
 filterDept.addEventListener('change', applyFilter);
 filterStatus.addEventListener('change', applyFilter);
+searchInput.addEventListener('input', applyFilter);
 
 function toggleConditionalFields() {
   const status = employmentStatusSelect.value;
