@@ -57,6 +57,12 @@ def admin_audit_logs_page():
     return render_template("admin/audit_logs.html", active="audit")
 
 
+@bp.get("/admin/applications")
+@admin_required
+def admin_applications_page():
+    return render_template("admin/applications.html", active="applications")
+
+
 @bp.get("/employee/dashboard")
 @login_required
 def employee_dashboard_page():

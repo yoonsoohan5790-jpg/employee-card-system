@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사원증 신청 - 사원증 관리 시스템</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box" style="width:420px;">
+      <h1>사원증 신청</h1>
+      <p class="sub">신규 조직원용 · 로그인 없이 신청할 수 있습니다</p>
+
+      <div id="formArea">
+        <div class="login-error" id="applyError"></div>
+        <form id="applyForm">
+          <label style="display:block; font-size:12px; color:#6b7280; margin:10px 0 4px; text-align:left;">이름</label>
+          <input type="text" id="f_name" required>
+
+          <label style="display:block; font-size:12px; color:#6b7280; margin:10px 0 4px; text-align:left;">사번</label>
+          <input type="text" id="f_employee_number" placeholder="로그인 아이디로 사용됩니다" required>
+
+          <label style="display:block; font-size:12px; color:#6b7280; margin:10px 0 4px; text-align:left;">부서</label>
+          <input type="text" id="f_department" required>
+
+          <label style="display:block; font-size:12px; color:#6b7280; margin:10px 0 4px; text-align:left;">직책</label>
+          <input type="text" id="f_position" required>
+
+          <label style="display:block; font-size:12px; color:#6b7280; margin:10px 0 4px; text-align:left;">기타사항 (선택)</label>
+          <textarea id="f_note" rows="3" placeholder="특이사항이 있으면 적어주세요. 입력 시 관리자 검토 후 발급됩니다."
+            style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit; resize:vertical;"></textarea>
+
+          <button type="submit" style="margin-top:16px;">신청하기</button>
+        </form>
+      </div>
+
+      <div id="resultArea" style="display:none;">
+        <div id="resultMessage" style="font-size:14px; padding:12px 0; text-align:left;"></div>
+      </div>
+
+      <div class="login-hint">
+        이미 사원증이 있으신가요? <a href="{{ url_for('pages.login_page') }}">로그인하기</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/apply.js') }}"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@ from .access_area import AccessArea
 from .access_policy import AccessPolicy
 from .user_access import UserAccess
 from .audit_log import AuditLog
+from .card_application import CardApplication
 
 __all__ = [
     "User",
@@ -12,4 +13,5 @@ __all__ = [
     "AccessPolicy",
     "UserAccess",
     "AuditLog",
+    "CardApplication",
 ]

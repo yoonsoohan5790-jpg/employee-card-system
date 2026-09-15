@@ -21,6 +21,7 @@ def create_app(config_class=Config):
     from routes.pages import bp as pages_bp
     from routes.admin_seed import bp as admin_seed_bp
     from routes.alerts import bp as alerts_bp
+    from routes.applications import bp as applications_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
@@ -31,6 +32,7 @@ def create_app(config_class=Config):
     app.register_blueprint(pages_bp)
     app.register_blueprint(admin_seed_bp)
     app.register_blueprint(alerts_bp)
+    app.register_blueprint(applications_bp)
 
     with app.app_context():
         db.create_all()

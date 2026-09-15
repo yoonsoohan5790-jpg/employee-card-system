@@ -13,6 +13,7 @@
       <nav>
         <a href="{{ url_for('pages.admin_dashboard_page') }}" class="{{ 'active' if active == 'dashboard' else '' }}">대시보드</a>
         <a href="{{ url_for('pages.admin_users_page') }}" class="{{ 'active' if active == 'users' else '' }}">조직원 관리</a>
+        <a href="{{ url_for('pages.admin_applications_page') }}" class="{{ 'active' if active == 'applications' else '' }}">사원증 신청 관리</a>
         <a href="{{ url_for('pages.admin_cards_page') }}" class="{{ 'active' if active == 'cards' else '' }}">사원증 관리</a>
         <a href="{{ url_for('pages.admin_access_page') }}" class="{{ 'active' if active == 'access' else '' }}">출입권한 관리</a>
         <a href="{{ url_for('pages.admin_policies_page') }}" class="{{ 'active' if active == 'policies' else '' }}">권한 정책 관리</a>
