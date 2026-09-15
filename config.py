@@ -19,10 +19,17 @@ class Config:
     _database_url = os.environ.get("DATABASE_URL")
     if _database_url:
         SQLALCHEMY_DATABASE_URI = _normalize_db_url(_database_url)
+        # Supabase의 Transaction Pooler(PgBouncer)는 연결마다 다른 백엔드 세션으로 라우팅될 수 있어
+        # psycopg3의 서버사이드 prepared statement 캐싱과 함께 쓰면
+        # "prepared statement ... already exists" 오류가 발생한다. prepare_threshold=None으로 비활성화한다.
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+            "connect_args": {"prepare_threshold": None},
+        }
     else:
         SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(BASE_DIR, "database.db")
+        SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
 
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
