@@ -29,9 +29,21 @@ async function loadCardChart() {
       datasets: [{
         data: data.values,
         backgroundColor: ['#2563eb', '#d97706', '#6b7280', '#dc2626'],
+        borderWidth: 2,
+        borderColor: '#ffffff',
       }],
     },
-    options: { plugins: { legend: { position: 'bottom' } } },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, padding: 14, font: { size: 12 } },
+        },
+      },
+    },
   });
 }
 
@@ -55,13 +67,18 @@ async function loadDeptChart() {
     data: {
       labels,
       datasets: [
-        { label: '활성', data: active, backgroundColor: '#2563eb' },
-        { label: '중지', data: suspended, backgroundColor: '#dc2626' },
+        { label: '활성', data: active, backgroundColor: '#2563eb', borderRadius: 4, maxBarThickness: 36 },
+        { label: '중지', data: suspended, backgroundColor: '#dc2626', borderRadius: 4, maxBarThickness: 36 },
       ],
     },
     options: {
       responsive: true,
-      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 14, font: { size: 12 } } } },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f1f3f6' } },
+      },
     },
   });
 }

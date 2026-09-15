@@ -28,7 +28,9 @@
 <div class="panel-grid">
   <div class="panel">
     <h3>사원증 상태 현황</h3>
-    <canvas id="cardStatusChart" height="140"></canvas>
+    <div class="chart-box">
+      <canvas id="cardStatusChart"></canvas>
+    </div>
   </div>
   <div class="panel">
     <h3>권한 이상 알림</h3>
@@ -40,7 +42,9 @@
 
 <div class="panel">
   <h3>부서별 사원증 현황</h3>
-  <canvas id="departmentChart" height="110"></canvas>
+  <div class="chart-box chart-box-wide">
+    <canvas id="departmentChart"></canvas>
+  </div>
 </div>
 {% endblock %}
 
