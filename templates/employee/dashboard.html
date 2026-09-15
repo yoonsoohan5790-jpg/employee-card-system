@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 사원증 - 사원증 관리 시스템</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="background:#f4f6fb;">
+  <div class="employee-wrap">
+    <div class="topbar">
+      <div class="greeting">안녕하세요, {{ user.name }}님.</div>
+      <a href="#" id="logoutLink" class="btn secondary small">로그아웃</a>
+    </div>
+
+    <div class="id-card">
+      <div class="card-title">내 사원증</div>
+      <div class="card-number" id="cardNumber">-</div>
+      <div class="card-row"><span>부서</span><span id="cardDept">{{ user.department }}</span></div>
+      <div class="card-row"><span>직급</span><span id="cardPosition">{{ user.position }}</span></div>
+      <div class="card-row"><span>상태</span><span><span class="status-dot" id="statusDot"></span><span id="cardStatus">-</span></span></div>
+      <div class="card-row"><span>발급일</span><span id="cardIssueDate">-</span></div>
+    </div>
+
+    <div class="panel">
+      <h3>출입 가능 구역</h3>
+      <ul class="area-list" id="areaList">
+        <li>불러오는 중...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('logoutLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    });
+
+    const STATUS_LABEL = { active: '활성', suspended: '중지', expired: '만료', revoked: '폐기' };
+
+    async function load() {
+      const userId = {{ user.id }};
+      const [userRes, accessRes] = await Promise.all([
+        fetch(`/api/users/${userId}`),
+        fetch(`/api/users/${userId}/access`),
+      ]);
+      const user = await userRes.json();
+      const access = await accessRes.json();
+
+      const card = user.card;
+      if (card) {
+        document.getElementById('cardNumber').textContent = card.card_id;
+        document.getElementById('cardIssueDate').textContent = card.issue_date || '-';
+        document.getElementById('cardStatus').textContent = STATUS_LABEL[card.status] || card.status;
+        const dot = document.getElementById('statusDot');
+        if (card.status !== 'active') dot.classList.add('off');
+      } else {
+        document.getElementById('cardNumber').textContent = '미발급';
+        document.getElementById('cardStatus').textContent = '-';
+      }
+
+      const areaList = document.getElementById('areaList');
+      areaList.innerHTML = '';
+      if (!access.grants || access.grants.length === 0) {
+        areaList.innerHTML = '<li>부여된 출입권한이 없습니다.</li>';
+        return;
+      }
+      access.grants.forEach(g => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${g.area_name}</span><span class="${g.allowed ? 'access-yes' : 'access-no'}">${g.allowed ? '✓ 허용' : '✕ 차단'}</span>`;
+        areaList.appendChild(li);
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}변경 이력{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h2>사원증 · 출입권한 변경 이력</h2>
+  <span class="user-chip">{{ session.get('name') }}님 (관리자)</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>시간</th><th>사원 ID</th><th>사원증</th><th>변경 유형</th><th>변경 전</th><th>변경 후</th><th>변경자</th>
+      </tr>
+    </thead>
+    <tbody id="auditTableBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/audit.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}사원증 관리{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h2>사원증 관리</h2>
+  <span class="user-chip">{{ session.get('name') }}님 (관리자)</span>
+</div>
+
+<div class="toolbar">
+  <div class="filters">
+    <select id="filterStatus">
+      <option value="">전체 상태</option>
+      <option value="active">활성</option>
+      <option value="suspended">중지</option>
+      <option value="expired">만료</option>
+      <option value="revoked">폐기</option>
+    </select>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Card ID</th><th>사원</th><th>부서</th><th>직급</th><th>발급일</th><th>상태</th><th>관리</th>
+      </tr>
+    </thead>
+    <tbody id="cardTableBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cards.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}사원증 관리 시스템{% endblock %} - 사원증 관리 시스템</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand">🪪 사원증 관리 시스템</div>
+      <nav>
+        <a href="{{ url_for('pages.admin_dashboard_page') }}" class="{{ 'active' if active == 'dashboard' else '' }}">대시보드</a>
+        <a href="{{ url_for('pages.admin_users_page') }}" class="{{ 'active' if active == 'users' else '' }}">조직원 관리</a>
+        <a href="{{ url_for('pages.admin_cards_page') }}" class="{{ 'active' if active == 'cards' else '' }}">사원증 관리</a>
+        <a href="{{ url_for('pages.admin_access_page') }}" class="{{ 'active' if active == 'access' else '' }}">출입권한 관리</a>
+        <a href="{{ url_for('pages.admin_policies_page') }}" class="{{ 'active' if active == 'policies' else '' }}">권한 정책 관리</a>
+        <a href="{{ url_for('pages.admin_audit_logs_page') }}" class="{{ 'active' if active == 'audit' else '' }}">변경 이력</a>
+      </nav>
+      <div class="logout">
+        <a href="#" id="logoutLink">로그아웃</a>
+      </div>
+    </aside>
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('logoutLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

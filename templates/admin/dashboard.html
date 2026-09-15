@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}대시보드{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h2>사원증 현황 대시보드</h2>
+  <span class="user-chip">{{ session.get('name') }}님 (관리자) · 5초마다 자동 갱신</span>
+</div>
+
+<div class="summary-grid">
+  <div class="summary-card">
+    <div class="label">전체 조직원</div>
+    <div class="value" id="sumTotal">-</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">활성 사원증</div>
+    <div class="value" id="sumActive">-</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">중지 사원증</div>
+    <div class="value" id="sumSuspended">-</div>
+  </div>
+  <div class="summary-card alert">
+    <div class="label">권한 이상</div>
+    <div class="value" id="sumAnomaly">-</div>
+  </div>
+</div>
+
+<div class="panel-grid">
+  <div class="panel">
+    <h3>사원증 상태 현황</h3>
+    <canvas id="cardStatusChart" height="140"></canvas>
+  </div>
+  <div class="panel">
+    <h3>권한 이상 알림</h3>
+    <ul class="alert-list" id="alertList">
+      <li class="alert-empty">불러오는 중...</li>
+    </ul>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>부서별 사원증 현황</h3>
+  <canvas id="departmentChart" height="110"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

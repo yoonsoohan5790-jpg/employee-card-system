@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}출입권한 관리{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h2>조직원별 출입권한 현황</h2>
+  <span class="user-chip">{{ session.get('name') }}님 (관리자)</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr id="accessTableHead">
+        <th>조직원</th><th>부서</th><th>직급</th><th>재직상태</th><th>권한상태</th>
+      </tr>
+    </thead>
+    <tbody id="accessTableBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/access.js') }}"></script>
+{% endblock %}
