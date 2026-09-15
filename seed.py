@@ -4,7 +4,6 @@
 """
 from datetime import date, timedelta
 
-from app import create_app
 from extensions import db
 from models.user import User, ROLE_ADMIN, ROLE_EMPLOYEE
 from models.access_area import AccessArea
@@ -103,6 +102,8 @@ def seed_data():
 
 def run():
     """로컬 개발용 CLI 진입점: 기존 테이블을 모두 지우고 새로 시딩한다."""
+    from app import create_app  # 지연 import: admin_seed 라우트가 seed_data()만 가져올 때 app.py 순환 참조를 피하기 위함
+
     app = create_app()
     with app.app_context():
         db.drop_all()

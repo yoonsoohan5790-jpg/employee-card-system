@@ -1,7 +1,10 @@
 import os
 from datetime import timedelta
 
+from dotenv import load_dotenv
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 def _normalize_db_url(url: str) -> str:
@@ -42,3 +45,10 @@ class Config:
     # Vercel 같은 서버리스 환경은 상시 실행 스레드를 지원하지 않으므로 비활성화하고,
     # 대신 대시보드/목록 조회 시점에 employment_service.check_leave_end_dates()를 인라인으로 호출한다.
     ENABLE_BACKGROUND_SCHEDULER = os.environ.get("ENABLE_BACKGROUND_SCHEDULER", "true").lower() == "true"
+
+    # 권한 이상 알림 메일 발송(260915_mailsender 스킬 기반). 모두 없으면 메일 기능은 비활성 상태로 동작하며
+    # 호출 시 안내 메시지를 반환한다.
+    MAIL_SENDER_EMAIL = os.environ.get("MAIL_SENDER_EMAIL")
+    MAIL_SENDER_APP_PASSWORD = os.environ.get("MAIL_SENDER_APP_PASSWORD")
+    # 알림 메일을 받을 주소. 지정 없으면 발신자 본인 메일함으로 보낸다.
+    MAIL_ALERT_RECIPIENT = os.environ.get("MAIL_ALERT_RECIPIENT") or MAIL_SENDER_EMAIL

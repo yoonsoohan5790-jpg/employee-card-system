@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사원증 중지 확인 - 사원증 관리 시스템</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box" style="width:420px;">
+      <h1>사원증 중지 확인</h1>
+      <p class="sub">메일로 전달된 조치 링크입니다</p>
+
+      <div class="panel" style="text-align:left; margin-bottom:16px;">
+        <p style="margin:4px 0;"><strong>{{ user.name }}</strong> ({{ user.department }} / {{ user.position }})</p>
+        <p style="margin:4px 0; color:#6b7280; font-size:13px;">재직 상태: {{ user.employment_status }}</p>
+      </div>
+
+      <p style="font-size:13px; color:#374151;">
+        이 조직원의 사원증을 즉시 <strong style="color:#dc2626;">중지</strong>하고 모든 출입권한을
+        회수합니다. 계속하시겠습니까?
+      </p>
+
+      <form method="POST" action="{{ url_for('alerts.suspend_via_link') }}">
+        <input type="hidden" name="token" value="{{ token }}">
+        <button type="submit" class="btn danger" style="width:100%; padding:10px; border:none; border-radius:6px; font-size:14px; margin-top:12px;">
+          지금 중지하기
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -85,10 +85,41 @@ async function loadAlerts() {
   items.forEach(item => {
     const li = document.createElement('li');
     const tagClass = item.tag === '위험' ? 'tag' : 'tag warn';
-    li.innerHTML = `<span>⚠ ${item.name} (${item.department} / ${item.position}) - ${item.text}</span><span class="${tagClass}">${item.tag}</span>`;
+    li.innerHTML = `
+      <span>⚠ ${item.name} (${item.department} / ${item.position}) - ${item.text}</span>
+      <span style="display:flex; align-items:center; gap:8px;">
+        <button class="btn small secondary" onclick="notifyAnomaly(${item.user_id}, '${item.name}')">메일 발송</button>
+        <span class="${tagClass}">${item.tag}</span>
+      </span>
+    `;
     list.appendChild(li);
   });
 }
+
+window.notifyAnomaly = async function (userId, name) {
+  const ok = confirm(
+    `${name}님의 권한 이상 내역을 관리자 알림 메일로 발송합니다.\n` +
+    `(메일에는 즉시 사원증을 중지할 수 있는 조치 링크가 포함됩니다.)\n\n` +
+    `발송하시겠습니까?`
+  );
+  if (!ok) return;
+
+  try {
+    const res = await fetch('/api/alerts/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || '메일 발송에 실패했습니다.');
+      return;
+    }
+    alert('알림 메일을 발송했습니다.');
+  } catch (e) {
+    alert('메일 발송 중 오류가 발생했습니다.');
+  }
+};
 
 async function refreshAll() {
   try {
