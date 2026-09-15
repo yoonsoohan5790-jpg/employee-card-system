@@ -55,47 +55,59 @@ EMPLOYEES = [
 ]
 
 
+def seed_data():
+    """
+    현재 앱 컨텍스트의 DB가 비어 있을 때만 초기 데이터를 생성한다.
+    이미 데이터가 있으면 아무 것도 하지 않고 건너뛴다 (원격 DB에 반복 호출해도 안전).
+    """
+    if User.query.count() > 0:
+        return {"status": "skipped", "reason": "이미 데이터가 존재합니다."}
+
+    area_map = {}
+    for code, name, desc in AREAS:
+        area = AccessArea(area_code=code, area_name=name, description=desc, active=True)
+        db.session.add(area)
+        db.session.flush()
+        area_map[code] = area
+
+    for (dept, pos), allowed_map in POLICIES.items():
+        for code, allowed in allowed_map.items():
+            db.session.add(AccessPolicy(department=dept, position=pos, area_id=area_map[code].id, allowed=allowed))
+    db.session.flush()
+
+    admin = User(username="admin", name="관리자", department="경영지원팀", position="관리자",
+                 email="admin@etners.com", role=ROLE_ADMIN, employment_status="재직", hire_date=date.today())
+    admin.set_password("admin123")
+    db.session.add(admin)
+    db.session.flush()
+
+    for emp in EMPLOYEES:
+        data = dict(emp)
+        password = data.pop("password")
+        user = User(role=ROLE_EMPLOYEE, **data)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.flush()
+
+        if user.employment_status == "재직":
+            card_service.issue_card(user, actor="SYSTEM")
+        else:
+            access_service.apply_policy_for_user(user, actor="SYSTEM")
+            if user.employment_status in ("휴직", "퇴사"):
+                card_service.issue_card(user, actor="SYSTEM")
+                card_service.suspend_card(user, actor="SYSTEM", reason=f"{user.employment_status} 처리")
+
+    db.session.commit()
+    return {"status": "ok"}
+
+
 def run():
+    """로컬 개발용 CLI 진입점: 기존 테이블을 모두 지우고 새로 시딩한다."""
     app = create_app()
     with app.app_context():
         db.drop_all()
         db.create_all()
-
-        area_map = {}
-        for code, name, desc in AREAS:
-            area = AccessArea(area_code=code, area_name=name, description=desc, active=True)
-            db.session.add(area)
-            db.session.flush()
-            area_map[code] = area
-
-        for (dept, pos), allowed_map in POLICIES.items():
-            for code, allowed in allowed_map.items():
-                db.session.add(AccessPolicy(department=dept, position=pos, area_id=area_map[code].id, allowed=allowed))
-        db.session.flush()
-
-        admin = User(username="admin", name="관리자", department="경영지원팀", position="관리자",
-                     email="admin@etners.com", role=ROLE_ADMIN, employment_status="재직", hire_date=date.today())
-        admin.set_password("admin123")
-        db.session.add(admin)
-        db.session.flush()
-
-        for emp in EMPLOYEES:
-            data = dict(emp)
-            password = data.pop("password")
-            user = User(role=ROLE_EMPLOYEE, **data)
-            user.set_password(password)
-            db.session.add(user)
-            db.session.flush()
-
-            if user.employment_status == "재직":
-                card_service.issue_card(user, actor="SYSTEM")
-            else:
-                access_service.apply_policy_for_user(user, actor="SYSTEM")
-                if user.employment_status in ("휴직", "퇴사"):
-                    card_service.issue_card(user, actor="SYSTEM")
-                    card_service.suspend_card(user, actor="SYSTEM", reason=f"{user.employment_status} 처리")
-
-        db.session.commit()
+        seed_data()
         print("초기 데이터 생성 완료.")
         print("관리자 계정: admin / admin123")
         print("조직원 계정 예시: hong / pass1234 (경영지원팀 사원)")
